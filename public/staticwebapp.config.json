@@ -1,0 +1,19 @@
+{
+  "routes": [
+    { "route": "/.auth/login/aad", "statusCode": 404 },
+    { "route": "/.auth/*", "allowedRoles": ["anonymous"] },
+    { "route": "/login", "redirect": "/.auth/login/github", "statusCode": 302, "allowedRoles": ["anonymous"] },
+    { "route": "/logout", "redirect": "/.auth/logout", "statusCode": 302, "allowedRoles": ["anonymous"] },
+    { "route": "/access-denied.html", "allowedRoles": ["anonymous"] },
+    { "route": "/*", "allowedRoles": ["atlas_reader"] }
+  ],
+  "responseOverrides": {
+    "401": { "redirect": "/.auth/login/github?post_login_redirect_uri=.referrer", "statusCode": 302 },
+    "403": { "rewrite": "/access-denied.html" }
+  },
+  "globalHeaders": {
+    "Cache-Control": "private, no-store",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "strict-origin-when-cross-origin"
+  }
+}

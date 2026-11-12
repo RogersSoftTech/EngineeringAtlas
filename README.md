@@ -42,9 +42,9 @@ git push -u origin main
 
 The included `.gitignore` excludes dependencies, build output, caches and environment secrets. Commit `package-lock.json` so local and GitHub builds use the same dependency versions. GitHub Actions runs tests and a production build for pushes to main and pull requests.
 
-### Optional: publish using GitHub Pages
+## Deploy to Azure
 
-In repository **Settings → Pages**, select **GitHub Actions** as the source. Then choose **Actions → Deploy to GitHub Pages → Run workflow**. The deployment workflow is manual; saving the code does not publish the app. GitHub Pages availability depends on your repository/account plan, and Pages may make the site publicly accessible. There is no ChatGPT sign-in gate in this standalone app. Personal notes remain local to the browser and are never committed or uploaded by this app.
+The production workflow builds, tests, and deploys to an invite-only Azure Static Web App. Pushes to `main` deploy automatically after the Azure settings are configured. See [DEPLOYMENT.md](DEPLOYMENT.md) for the live target, GitHub secrets, role invitations, and deployment controls.
 
 ## Use the workspace
 
@@ -72,7 +72,7 @@ src/app/*component.*           Angular pages and reusable topic card
 src/app/*.spec.ts              Functional and component tests
 src/styles.css                Responsive design
 .github/workflows/ci.yml       Build and test on GitHub
-.github/workflows/pages.yml    Optional manual Pages deployment
+.github/workflows/azure-static-web-apps.yml    Azure production deployment
 ```
 
 Extend the roadmap content in `curriculum.ts`. Keep existing IDs stable to retain saved progress. The architecture and leadership diagrams are reusable contextual references shared across the corresponding modules.
