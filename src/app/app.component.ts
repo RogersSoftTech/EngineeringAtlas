@@ -18,6 +18,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
       <nav aria-label="Main navigation">
         <a routerLink="/dashboard" routerLinkActive="active">▦ &nbsp; Overview</a>
         <a routerLink="/roadmaps" routerLinkActive="active">▤ &nbsp; Learning roadmaps</a>
+        <a routerLink="/courses" routerLinkActive="active">▥ &nbsp; Course library</a>
         <a routerLink="/takeaways" routerLinkActive="active">✧ &nbsp; My takeaways</a>
       </nav>
       <div class="side-bottom"><b>Built for your next chapter.</b><p>Technical depth.<br>Leadership that scales.</p>

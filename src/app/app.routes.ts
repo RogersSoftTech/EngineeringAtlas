@@ -12,5 +12,7 @@ export const routes: Routes = [
   { path: 'topic/:id', component: TopicComponent },
   { path: 'module/:id', component: ModuleComponent },
   { path: 'takeaways', component: TakeawaysComponent },
+  { path: 'courses', loadComponent: () => import('./courses.component').then(m=>m.CoursesComponent) },
+  { path: 'courses/:id', loadComponent: () => import('./course-reader.component').then(m=>m.CourseReaderComponent) },
   { path: '**', redirectTo: 'dashboard' }
 ];

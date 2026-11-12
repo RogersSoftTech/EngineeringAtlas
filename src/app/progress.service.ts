@@ -1,6 +1,7 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { topics } from './curriculum';
 import { AtlasState, Mode, ModuleWithTopic, Progress } from './models';
+import { courseCatalog } from './course-catalog';
 
 export const STORAGE_KEY = 'engineering-atlas-v1';
 export const modules: ModuleWithTopic[] = topics.flatMap(topic => topic.modules.map(module => ({ ...module, topic })));
@@ -18,7 +19,19 @@ export function validateBackup(value: unknown): AtlasState {
     if (v.confidence !== undefined && (!Number.isInteger(v.confidence) || v.confidence < 0 || v.confidence > 5)) throw new Error('Invalid confidence');
     records[key] = { started: !!v.started, done: !!v.done, confidence: v.confidence ?? 0, notes: v.notes ?? '', work: v.work ?? '', takeaway: v.takeaway ?? '', updated: Number(v.updated) || 0 };
   }
-  return { version: 1, mode: s.mode as Mode, records, last: modules.some(m => m.id === s.last) ? s.last! : null };
+  const courseRecords: Record<string, Progress> = {};
+  if (s.courseRecords !== undefined) {
+    if (!s.courseRecords || typeof s.courseRecords !== 'object' || Array.isArray(s.courseRecords)) throw new Error('Invalid course progress');
+    for (const [key,v] of Object.entries(s.courseRecords)) {
+      const [courseId,chapterId,extra] = key.split('/');
+      if (extra || !courseCatalog.some(c=>c.id===courseId) || !/^[a-z0-9-]{1,140}$/.test(chapterId ?? '') || !v || typeof v !== 'object' || Array.isArray(v)) throw new Error('Invalid course record');
+      for (const field of ['notes','work','takeaway'] as const) if (v[field] !== undefined && typeof v[field] !== 'string') throw new Error('Invalid course text');
+      if (v.confidence !== undefined && (!Number.isInteger(v.confidence) || v.confidence<0 || v.confidence>5)) throw new Error('Invalid confidence');
+      courseRecords[key] = {started:!!v.started,done:!!v.done,notes:v.notes??'',work:v.work??'',takeaway:v.takeaway??'',confidence:v.confidence??0,updated:Number(v.updated)||0};
+    }
+  }
+  const courseLast = s.courseLast && Object.hasOwn(courseRecords,s.courseLast.courseId+'/'+s.courseLast.chapterId) ? s.courseLast : undefined;
+  return { version: 1, mode: s.mode as Mode, records, last: modules.some(m => m.id === s.last) ? s.last! : null, courseRecords, courseLast };
 }
 
 @Injectable({ providedIn: 'root' })
@@ -35,6 +48,14 @@ export class ProgressService {
   readonly gaps = computed(() => this.assessed().filter(m => this.record(m.id).confidence! <= 2));
   readonly recommendations = computed(() => modules.filter(m => !this.record(m.id).done).sort((a, b) => this.score(b) - this.score(a)));
   readonly resume = computed(() => modules.find(m => m.id === this.state().last && !this.record(m.id).done) ?? this.recommendations()[0]);
+  readonly courseEntries = computed(() => Object.entries(this.state().courseRecords ?? {}).map(([key,record]) => {
+    const [courseId,chapterId] = key.split('/');
+    return { course: courseCatalog.find(c=>c.id===courseId)!, chapterId, record };
+  }).filter(entry=>entry.course));
+  readonly courseResume = computed(() => {
+    const last = this.state().courseLast;
+    return last && !this.courseRecord(last.courseId,last.chapterId).done ? {...last,course:courseCatalog.find(c=>c.id===last.courseId)} : undefined;
+  });
 
   constructor() {
     try {
@@ -61,10 +82,15 @@ export class ProgressService {
     this.persist();
   }
   toggleComplete(id: string) { this.update(id, { done: !this.record(id).done }); }
+  courseRecord(courseId: string, chapterId: string): Progress { return this.state().courseRecords?.[courseId+'/'+chapterId] ?? {}; }
+  updateCourse(courseId: string, chapterId: string, patch: Partial<Progress>) {
+    this.state.update(s=>({...s,courseRecords:{...s.courseRecords,[courseId+'/'+chapterId]:{...this.courseRecord(courseId,chapterId),...patch,updated:Date.now()}},courseLast:{courseId,chapterId}}));
+    this.persist();
+  }
   exportJson() { return JSON.stringify(this.state(), null, 2); }
   importJson(text: string) {
     const backup = validateBackup(JSON.parse(text));
-    this.state.update(s => ({ ...s, records: { ...s.records, ...backup.records } }));
+    this.state.update(s => ({ ...s, records: { ...s.records, ...backup.records }, courseRecords:{...s.courseRecords,...backup.courseRecords},courseLast:backup.courseLast??s.courseLast }));
     this.persist();
   }
   private score(m: ModuleWithTopic) {

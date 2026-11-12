@@ -13,7 +13,13 @@
         "styles": [
           "src/styles.css"
         ],
-        "outputPath": "dist/engineering-atlas"
+        "outputPath": "dist/engineering-atlas",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "public"
+          }
+        ]
       },
       "configurations": {
         "production": {

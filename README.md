@@ -2,6 +2,8 @@
 
 PrimeNG controls and the blue Aura theme are configured. See [PRIMENG.md](PRIMENG.md) for component details and local/CI license setup.
 
+The **Course library** connects 50 Deep Dive and Quick Course chat excerpts to your roadmaps, with section progress, notes, takeaways, original-chat links and full-export import. See [COURSES.md](COURSES.md) for coverage limits and how to replace excerpts with complete source replies.
+
 A standalone Angular 22 application for technical and engineering leadership development. Includes all 13 roadmaps and 39 modules from the original workspace, responsive layouts, real Angular templates, typed curriculum, signals, forms, routing and a shared progress service.
 
 ## Run locally

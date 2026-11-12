@@ -12,6 +12,7 @@ import { TopicCardComponent } from './topic-card.component';
     <div class="stat"><small>IN PROGRESS</small><strong>{{p.started().length}}</strong><small>Pick up where you left off</small></div>
     <div class="stat"><small>TAKEAWAYS CAPTURED</small><strong>{{p.takeaways().length}}</strong><small>Knowledge you can return to</small></div>
   </div>
+  <section class="panel course-resume"><div><span class="tag">YOUR CONVERSATIONS, CONNECTED</span><h2>Quick Courses & Deep Dives</h2><p class="muted">50 source chats across 29 topics. Read, reflect, and continue from your last section.</p>@if(p.courseResume();as r){<p>Continue: <a [routerLink]="['/courses',r.courseId]" [queryParams]="{section:r.chapterId}">{{r.course?.title}}</a></p>}</div><a class="button" routerLink="/courses">Open course library →</a></section>
   <div class="hero"><div>
     @if (p.resume(); as m) { <div class="tag">YOUR NEXT STEP</div><h2>{{m.title}}</h2><p>{{m.topic.name}} · {{m.minutes}} min · {{p.record(m.id).started ? 'Continue your unfinished module.' : 'Start with a practical, focused module.'}}</p><a class="button" [routerLink]="['/module', m.id]">Open module →</a> }
     @else { <div class="tag">ALL ROADMAPS COMPLETE</div><h2>Keep the learning alive.</h2><p>Revisit your notes, practice your explanations, and reassess confidence.</p><a class="button" routerLink="/roadmaps">Explore roadmaps →</a> }
