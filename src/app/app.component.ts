@@ -7,9 +7,11 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { CloudSyncService } from './cloud-sync.service';
+import { CloudStatusComponent } from './cloud-status.component';
 
 @Component({
-  selector: 'app-root', imports: [RouterLink, RouterLinkActive, RouterOutlet, FormsModule, ButtonModule, SelectButtonModule, ToastModule, ConfirmDialogModule],
+  selector: 'app-root', imports: [RouterLink, RouterLinkActive, RouterOutlet, FormsModule, ButtonModule, SelectButtonModule, ToastModule, ConfirmDialogModule, CloudStatusComponent],
   providers: [MessageService, ConfirmationService],
   template: `
     <aside>
@@ -24,13 +26,14 @@ import { MessageService, ConfirmationService } from 'primeng/api';
       <div class="side-bottom"><b>Built for your next chapter.</b><p>Technical depth.<br>Leadership that scales.</p>
         <p-button label="Export my progress" icon="pi pi-download" size="small" (onClick)="exportBackup()" />
         <label class="import">Import backup<input type="file" accept="application/json" (change)="importBackup($event)"></label>
-        <small>Saved in this browser · export to move devices.</small>
+        <small>Azure saves follow your sign-in. Export keeps an extra progress backup.</small>
       </div>
     </aside>
     <main>
       <header><span>Personal development / <b>Your workspace</b></span><p-selectbutton [options]="modes" optionLabel="label" optionValue="value" [allowEmpty]="false" [ngModel]="p.mode()" (ngModelChange)="p.setMode($event)" ariaLabel="Study mode" /></header>
-      @if (!p.storageOK()) { <div class="notice" role="alert">{{p.message()}}</div> }
-      <router-outlet />
+      @if (!p.storageOK()) { <div class="notice" role="alert">The device backup is unavailable. Check the cloud status below and export a progress backup if needed.</div> }
+      <atlas-cloud-status />
+      @if(cloud.ready()){<router-outlet />}@else{<div class="panel empty">Connecting your signed-in learning workspace. Your existing browser data is kept.</div>}
       <footer>ENGINEERING ATLAS <span>Small steps. Compounding growth.</span></footer>
     </main>
     <p-toast /><p-confirmdialog />
@@ -38,9 +41,11 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 })
 export class AppComponent {
   readonly p = inject(ProgressService);
+  readonly cloud = inject(CloudSyncService);
   private readonly messages = inject(MessageService);
   private readonly confirmation = inject(ConfirmationService);
   readonly modes = [{ label: 'Learning', value: 'learning' }, { label: 'Interview Prep', value: 'interview' }];
+  constructor(){void this.cloud.start();}
   exportBackup() {
     const url = URL.createObjectURL(new Blob([this.p.exportJson()], { type: 'application/json' }));
     const a = document.createElement('a'); a.href = url; a.download = 'engineering-atlas-backup.json'; a.click();

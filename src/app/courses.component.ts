@@ -12,7 +12,7 @@ import { topics } from './curriculum';
 
 @Component({ selector:'atlas-courses', imports:[RouterLink,FormsModule,InputTextModule,SelectButtonModule,ButtonModule], template:`
   <div class="intro"><div class="tag">FROM YOUR CHATS TO YOUR PRACTICE</div><h1>Your course library.</h1><p>Quick Courses for focused study. Deep Dives for deeper understanding. All connected to your roadmaps.</p></div>
-  <div class="course-library-banner"><div><h2>50 conversations. One place to continue.</h2><p>The bundled texts are excerpts from your chats, not complete courses. Import <b>conversations.json</b> from a ChatGPT data export to replace matching excerpts with complete replies. Imports stay in this browser.</p></div><label class="button import-course">{{importing() ? 'Importing…' : 'Import full chat export'}}<input type="file" accept=".json,application/json" [disabled]="importing()" (change)="importFile($event)"></label></div>
+  <div class="course-library-banner"><div><h2>50 conversations. One place to continue.</h2><p>The bundled texts are excerpts from your chats, not complete courses. Import <b>conversations.json</b> from a ChatGPT data export to replace matching excerpts with complete replies. When connected, imports save to your Azure account.</p></div><label class="button import-course">{{importing() ? 'Importing…' : 'Import full chat export'}}<input type="file" accept=".json,application/json" [disabled]="importing()" (change)="importFile($event)"></label></div>
   @if (message()) { <p role="status" class="evidence">{{message()}}</p> }
   <div class="course-tools"><input pInputText aria-label="Search courses" placeholder="Search course topics…" [ngModel]="search()" (ngModelChange)="search.set($event)"><p-selectbutton [options]="tracks" optionLabel="label" optionValue="value" [allowEmpty]="false" [ngModel]="track()" (ngModelChange)="track.set($event)" ariaLabel="Course format" /></div>
   @if (roadmapName(); as name) { <p class="muted">Courses connected to {{name}} · <a routerLink="/courses">Show all courses</a></p> }
@@ -35,7 +35,7 @@ export class CoursesComponent {
   async importFile(event:Event){
     const input=event.target as HTMLInputElement;
     try {const file=input.files?.[0];if(!file)return;if(file.size>100_000_000)throw new Error('Please use a JSON export smaller than 100 MB.');this.importing.set(true);
-      const count=await this.library.importExport(await file.text());this.message.set(count+' course texts imported. Existing progress and notes were kept.');
+      const count=await this.library.importExport(await file.text());this.message.set(count+' course texts imported. '+this.library.syncMessage()+' Existing progress and notes were kept.');
     }catch(error){this.message.set(error instanceof Error?error.message:'Import could not be saved.');}finally{this.importing.set(false);input.value='';}
   }
 }

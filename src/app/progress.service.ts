@@ -36,6 +36,8 @@ export function validateBackup(value: unknown): AtlasState {
 
 @Injectable({ providedIn: 'root' })
 export class ProgressService {
+  private storageKey=STORAGE_KEY;
+  onLocalSave?:()=>void;
   readonly state = signal<AtlasState>(emptyState());
   readonly message = signal('');
   readonly storageOK = signal(true);
@@ -88,6 +90,9 @@ export class ProgressService {
     this.persist();
   }
   exportJson() { return JSON.stringify(this.state(), null, 2); }
+  activateCloudScope(owner:string){this.storageKey=STORAGE_KEY+':'+owner;const raw=localStorage.getItem(this.storageKey);this.state.set(raw?validateBackup(JSON.parse(raw)):emptyState());}
+  replaceState(state:AtlasState){this.state.set(validateBackup(state));this.persist();}
+  legacyState():AtlasState|null{try{const raw=localStorage.getItem(STORAGE_KEY);return raw?validateBackup(JSON.parse(raw)):null;}catch{return null;}}
   importJson(text: string) {
     const backup = validateBackup(JSON.parse(text));
     this.state.update(s => ({ ...s, records: { ...s.records, ...backup.records }, courseRecords:{...s.courseRecords,...backup.courseRecords},courseLast:backup.courseLast??s.courseLast }));
@@ -98,7 +103,8 @@ export class ProgressService {
     return (r.started ? 100 : 0) + (r.confidence ? 6 - r.confidence : 0) * 10 - m.topic.modules.findIndex(x => x.id === m.id);
   }
   private persist() {
-    try { localStorage.setItem(STORAGE_KEY, this.exportJson()); this.storageOK.set(true); this.message.set('Saved in this browser ✓'); }
+    try { localStorage.setItem(this.storageKey, this.exportJson()); this.storageOK.set(true); this.message.set(this.storageKey===STORAGE_KEY?'Saved in this browser ✓':'Saved on this device · Azure sync pending'); }
     catch { this.storageOK.set(false); this.message.set('Could not save. Export a backup before closing this page.'); }
+    this.onLocalSave?.();
   }
 }

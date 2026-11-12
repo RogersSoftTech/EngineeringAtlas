@@ -19,3 +19,7 @@ coverage/
 .claude/worktrees
 .claude/settings.local.json
 src/primeui-license.local.ts
+**/bin/
+**/obj/
+**/local.settings.json
+TestResults/

@@ -21,14 +21,14 @@ Course records are separate from roadmap records. Original module progress and i
 
 Get a ChatGPT data export and extract its **conversations.json** file. In **Course library**, choose **Import full chat export** and select that JSON file (up to 100 MB). The app matches the 50 known courses by conversation ID or exact title, reads assistant text from the current conversation branch, and replaces those excerpts in this browser. Other chats, prompts, and inactive answer branches are not imported.
 
-The file is processed locally and is not uploaded. Imported text is stored in IndexedDB. Existing chapter IDs are based on their headings, so replacing an excerpt with the matching full reply preserves section progress and notes for unchanged headings. Rewriting headings can produce new section IDs.
+The file is parsed in the browser. Matching assistant course text is saved through the authenticated API to private Azure Blob Storage, with an account-scoped IndexedDB device copy. Unrelated chats and user prompts are not uploaded. Existing chapter IDs are based on their headings, so replacing an excerpt with the matching full reply preserves section progress and notes for unchanged headings. Rewriting headings can produce new section IDs.
 
 Alternatively import one Atlas course JSON document shaped like the bundled files. Its `truncated` flags are preserved; only an actually complete source should have `truncated: false`.
 
-Imported course texts are local browser replacements, not automatic updates to the repository or the original ChatGPT conversations. Your regular progress backup includes course notes and completion, but **does not include imported source text**. Keep your original ChatGPT export so you can reimport it on another device. Clearing site storage removes local imports.
+Imported course text follows your invited sign-in across devices after Azure confirms the upload. It does not update the repository or original chats. Your progress export still **does not include imported source text**; keep the original ChatGPT export as an additional backup. Clearing site storage removes device copies but does not delete cloud records. See AZURE_STORAGE.md for migration and offline/conflict behavior.
 
 ## Rendering and hosting
 
 Markdown includes headings, tables, lists, links and fenced code. Raw HTML is displayed as text, external source images are replaced by a source-reference notice, and Angular sanitizes rendered HTML. Code examples are displayed, never executed. Diagrams expressed as plain text remain readable code/text; missing generated visuals are not reconstructed as if they were the original.
 
-Assets use the document base URL and work with the existing GitHub Pages relative-base build. No backend, API key, ChatGPT sign-in or live chat access is required to read the packaged excerpts. Opening original chats requires your own ChatGPT access.
+Assets use the document base URL and work with the existing GitHub Pages relative-base build. The deployed app uses its own Azure/GitHub sign-in and managed storage API; it does not need ChatGPT sign-in or live chat access to read packaged excerpts. Opening original chats requires your own ChatGPT access.

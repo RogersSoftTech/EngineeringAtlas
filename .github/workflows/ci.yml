@@ -16,6 +16,10 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
       - run: npm ci
       - run: npm test
+      - run: npm run test:api
       - run: npm run build

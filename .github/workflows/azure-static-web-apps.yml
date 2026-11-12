@@ -28,21 +28,36 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
       - name: Install locked dependencies
         run: npm ci
       - name: Run tests
         run: npm test
+      - name: Test the authenticated storage API
+        run: npm run test:api
       - name: Build production site
         env:
           PRIMEUI_LICENSE_KEY: ${{ secrets.PRIMEUI_LICENSE_KEY }}
         run: npm run build
       - name: Verify packaged site and access rules
-        run: node scripts/verify-azure-deployment.cjs dist/engineering-atlas/browser
+        run: |
+          npm run build:api
+          node scripts/verify-azure-deployment.cjs dist/engineering-atlas/browser dist/api
       - name: Upload verified deployment package
         uses: actions/upload-artifact@v4
         with:
           name: azure-static-site
           path: dist/engineering-atlas/browser
+          retention-days: 3
+          if-no-files-found: error
+      - name: Upload managed .NET API
+        uses: actions/upload-artifact@v4
+        with:
+          name: azure-function-api
+          path: dist/api
+          include-hidden-files: true
           retention-days: 3
           if-no-files-found: error
 
@@ -66,6 +81,10 @@ jobs:
         with:
           name: azure-static-site
           path: dist/engineering-atlas/browser
+      - uses: actions/download-artifact@v4
+        with:
+          name: azure-function-api
+          path: dist/api
       - name: Publish the tested package
         id: deploy
         uses: Azure/static-web-apps-deploy@v1
@@ -73,7 +92,7 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: upload
           app_location: dist/engineering-atlas/browser
-          api_location: ''
+          api_location: dist/api
           output_location: ''
           skip_app_build: true
           skip_api_build: true
@@ -86,7 +105,7 @@ jobs:
           import fs from 'node:fs';
           const source = fs.readdirSync('dist/engineering-atlas/browser/courses').find(f => f.endsWith('.json'));
           if (!source || !process.env.SITE_URL) throw new Error('Missing deployment URL or course asset.');
-          for (const pathname of ['/', '/courses/' + source]) {
+          for (const pathname of ['/', '/courses/' + source, '/api/learning/session']) {
             let blocked = false;
             for (let attempt = 0; attempt < 6; attempt++) {
               const response = await fetch(new URL(pathname, process.env.SITE_URL), { redirect: 'manual' });
@@ -96,7 +115,7 @@ jobs:
             }
             if (!blocked) throw new Error('Expected GitHub sign-in redirect for ' + pathname);
           }
-          console.log('Anonymous requests to the app and direct course JSON require GitHub sign-in.');
+          console.log('Anonymous requests to the app, course JSON and storage API require GitHub sign-in.');
           NODE
       - name: Record deployment
         env:

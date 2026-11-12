@@ -10,7 +10,9 @@
     "prestart": "node scripts/configure-license.cjs",
     "prebuild": "node scripts/configure-license.cjs",
     "pretest": "node scripts/configure-license.cjs",
-    "prebuild:pages": "node scripts/configure-license.cjs"
+    "prebuild:pages": "node scripts/configure-license.cjs",
+    "build:api": "nx run engineering-atlas:api-build",
+    "test:api": "nx run engineering-atlas:api-test"
   },
   "engines": {
     "node": ">=22.22.3 <23 || >=24.15.0 <25 || >=26 <27"

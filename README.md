@@ -1,5 +1,7 @@
 # Engineering Atlas — Angular
 
+Signed-in notes, progress and imported courses now save to private Azure Blob Storage through a .NET 10 API. Open **Learn how cloud saving works** in the app, or read [AZURE_STORAGE.md](AZURE_STORAGE.md), for the architecture, migration and exercises. Localhost remains browser-only unless the API is emulated.
+
 PrimeNG controls and the blue Aura theme are configured. See [PRIMENG.md](PRIMENG.md) for component details and local/CI license setup.
 
 The **Course library** connects 50 Deep Dive and Quick Course chat excerpts to your roadmaps, with section progress, notes, takeaways, original-chat links and full-export import. See [COURSES.md](COURSES.md) for coverage limits and how to replace excerpts with complete source replies.
@@ -51,15 +53,15 @@ The production workflow builds, tests, and deploys to an invite-only Azure Stati
 - Choose a roadmap, then start a module. Each contains a lesson, contextual example, practical exercise and interview prompt with an answer guide.
 - Technical modules include a reference architecture diagram and Azure/AWS comparisons; leadership modules include a practice-cycle diagram.
 - Switch **Learning / Interview Prep** in the header. Each mode has independent notes, exercise or answer evidence, takeaways, confidence and completion.
-- Changes save as you type using browser local storage. The dashboard resumes the last unfinished module and recommends started and low-confidence work first.
+- Changes save as you type to your signed-in Azure account, with a browser cache for interrupted connections. The dashboard resumes the last unfinished module and recommends started and low-confidence work first.
 - Confidence 4–5 appears as a strength; 1–2 appears as a gap. Unassessed modules remain unknown. Completion does not imply mastery.
 - **Export my progress** creates a JSON backup. **Import backup** merges records after confirmation and replaces matching records.
 
 ### Bring progress from the previous site
 
-Export a backup from the original site, then import it into this Angular app. The module IDs and `engineering-atlas-v1` format are preserved. Storage belongs to a browser and site address: localhost, GitHub Pages and the original hosted site do **not** automatically share progress. Export before changing origin, browser, or clearing site data.
+Export a backup from the original site, then import it into this Angular app. The module IDs and `engineering-atlas-v1` format are preserved. For existing browser data, choose **Upload browser data to my account** once from that browser and site address. Wait for **Saved to Azure** before switching devices. Localhost remains browser-only. Keep JSON exports as an additional backup.
 
-There is no backend, login, telemetry, database, or cross-device synchronization. The curriculum is a starting point; cloud mappings represent capabilities rather than exact equivalents. Confirm current implementation details in official vendor documentation.
+The deployed app uses GitHub sign-in and a private .NET API for cross-device synchronization. The curriculum is a starting point; cloud mappings represent capabilities rather than exact equivalents. Confirm current implementation details in official vendor documentation.
 
 ## Project structure
 

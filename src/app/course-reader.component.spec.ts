@@ -9,12 +9,13 @@ import { ProgressService } from './progress.service';
 import { provideAtlasPrimeNG } from './prime-theme';
 import { courseCatalog } from './course-catalog';
 import { MarkdownComponent, cleanSourceMarkdown } from './markdown.component';
+import { signal } from '@angular/core';
 
 describe('course reader workflow',()=>{
   const id=courseCatalog[0].id;
   beforeEach(()=>{
     localStorage.clear();
-    TestBed.configureTestingModule({providers:[provideRouter(routes),provideAtlasPrimeNG(),{provide:CourseLibraryService,useValue:{load:vi.fn().mockResolvedValue({id,messages:[{id:'source',truncated:true,markdown:'# Course\n\nCourse overview.\n\n# Module 1 — Foundations\n\nStudy this section.'}]}),refreshImports:vi.fn()}}]});
+    TestBed.configureTestingModule({providers:[provideRouter(routes),provideAtlasPrimeNG(),{provide:CourseLibraryService,useValue:{revision:signal(0),load:vi.fn().mockResolvedValue({id,messages:[{id:'source',truncated:true,markdown:'# Course\n\nCourse overview.\n\n# Module 1 — Foundations\n\nStudy this section.'}]}),refreshImports:vi.fn()}}]});
   });
   it('renders source content, marks excerpts, and persists section notes',async()=>{
     const h=await RouterTestingHarness.create();await h.navigateByUrl('/courses/'+id,CourseReaderComponent);await h.fixture.whenStable();h.detectChanges();

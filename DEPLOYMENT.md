@@ -1,5 +1,7 @@
 # Azure deployment
 
+The production package now includes the managed .NET 10 API as well as Angular. See [AZURE_STORAGE.md](AZURE_STORAGE.md) for storage settings, API routes, per-user isolation and testing. The deployment action tests and publishes both packages; the API's `.azurefunctions` directory is retained in its artifact.
+
 EngineeringAtlas deploys from `main` in **RogersSoftTech/EngineeringAtlas** to **Azure Static Web Apps**, using the **Free** plan. The deployment workflow is `.github/workflows/azure-static-web-apps.yml`.
 
 ## Deployment target
@@ -46,7 +48,7 @@ Invitation links expire after the selected interval; an accepted role remains un
 
 Push the desired version to `main`, or run **Actions → Deploy to Azure Static Web Apps → Run workflow → main**. The workflow's summary identifies the deployed URL. To roll back, revert the relevant source commit on `main`; the action tests and deploys the reverted application. Pause automatic uploads by setting `AZURE_STATIC_WEB_APPS_READY` to `false`. The workflow does not depend on protected GitHub Environments, so it can run in this organization's private repository on the GitHub Free plan.
 
-Notes, progress and imported course replacements remain browser-local. Moving from localhost or another host creates a separate storage origin. Export progress and keep your ChatGPT source export before switching hosts.
+Signed-in notes, progress and imported course replacements save through the API to Azure. Use the one-time **Upload browser data to my account** prompt to migrate earlier browser-only data from the hostname where it was stored. Device caches still belong to individual origins; cloud data belongs to your sign-in for this Static Web App. Keep progress exports and original ChatGPT source exports as additional backups.
 
 ## Verification
 

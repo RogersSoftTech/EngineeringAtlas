@@ -53,7 +53,7 @@ export class CourseReaderComponent {
   readonly record=computed(()=>this.course()&&this.chapter()?this.p.courseRecord(this.course()!.id,this.chapter()!.id):{});
   readonly confidence=[{label:'Not assessed',value:0},{label:'1 · Need guidance',value:1},{label:'2 · Developing',value:2},{label:'3 · Can apply with support',value:3},{label:'4 · Independent',value:4},{label:'5 · Can teach',value:5}];
   constructor(){
-    effect(onCleanup=>{const c=this.course();this.attempt();this.document.set(null);this.error.set('');if(!c)return;this.loading.set(true);const abort=new AbortController();onCleanup(()=>abort.abort());
+    effect(onCleanup=>{const c=this.course();this.attempt();this.library.revision();this.document.set(null);this.error.set('');if(!c)return;this.loading.set(true);const abort=new AbortController();onCleanup(()=>abort.abort());
       void this.library.load(c.id,abort.signal).then(doc=>{if(!abort.signal.aborted)this.document.set(doc);}).catch(error=>{if(!abort.signal.aborted)this.error.set(error instanceof Error?error.message:'Unable to load course.');}).finally(()=>{if(!abort.signal.aborted)this.loading.set(false);});
     });
     effect(()=>{const c=this.course(),ch=this.chapter(),mode=this.p.mode();if(c&&ch&&mode==='learning')untracked(()=>this.p.updateCourse(c.id,ch.id,{started:true}));});

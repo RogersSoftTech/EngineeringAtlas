@@ -1,5 +1,12 @@
 # Verification
 
+## Azure learning storage — November 12, 2026
+
+- Angular tests, .NET API tests, production client build and API publish pass through Nx.
+- Coverage includes account isolation, offline queues, stale-write conflicts, safe browser migration, imported course synchronization, schema validation and managed-function registration.
+- A real Azure Blob integration test passed for progress reads/writes, imported course listing, per-user isolation, stale-write rejection and private-container configuration. Temporary test data was cleaned up.
+- Deployment packaging verifies the .NET 10 runtime, hidden Functions extensions, protected API routes and all 50 protected course assets.
+- The existing browser imports still require the explicit **Upload browser data to my account** migration; they are never silently uploaded.
 ## Course library integration — November 12, 2026
 
 - 50 source snapshots validated against their catalog entries (24 Quick Courses, 26 Deep Dives across 29 topics); all are explicitly flagged as partial.
@@ -17,4 +24,4 @@ Verified on Windows with Node.js 22.23.4, Angular 22.2.6, Angular build tooling 
 - `npm run build:pages`: relative-base static build passed.
 - Browser smoke check: dashboard and module rendered successfully; typed notes and takeaway persisted across reload, completion persisted, switching to Interview Prep showed independent empty fields, returning to Learning restored notes. Temporary verification text was cleared afterward.
 
-The GitHub workflows are included but have not been run in a GitHub repository or deployed to GitHub Pages. The existing private hosted site remains the original version; this deliverable is a standalone Angular project for your repository.
+The original checks above predate the Azure deployment. Production now uses the invite-only Azure Static Web App described in DEPLOYMENT.md.

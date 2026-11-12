@@ -14,5 +14,6 @@ export const routes: Routes = [
   { path: 'takeaways', component: TakeawaysComponent },
   { path: 'courses', loadComponent: () => import('./courses.component').then(m=>m.CoursesComponent) },
   { path: 'courses/:id', loadComponent: () => import('./course-reader.component').then(m=>m.CourseReaderComponent) },
+  { path: 'storage-lab', loadComponent: () => import('./storage-lab.component').then(m=>m.StorageLabComponent) },
   { path: '**', redirectTo: 'dashboard' }
 ];

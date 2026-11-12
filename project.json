@@ -1,11 +1,15 @@
 {
-  "$schema": "node_modules/nx/schemas/project-schema.json",
   "name": "engineering-atlas",
+  "$schema": "node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "sourceRoot": "src",
   "targets": {
     "build": {
       "executor": "@angular/build:application",
+      "defaultConfiguration": "production",
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "browser": "src/main.ts",
         "tsConfig": "tsconfig.app.json",
@@ -37,11 +41,7 @@
           "sourceMap": true,
           "extractLicenses": false
         }
-      },
-      "defaultConfiguration": "production",
-      "outputs": [
-        "{options.outputPath}"
-      ]
+      }
     },
     "serve": {
       "executor": "@angular/build:dev-server",
@@ -54,6 +54,22 @@
       "options": {
         "tsConfig": "tsconfig.spec.json",
         "runner": "vitest"
+      }
+    },
+    "api-build": {
+      "executor": "nx:run-commands",
+      "outputs": [
+        "{workspaceRoot}/dist/api"
+      ],
+      "options": {
+        "command": "dotnet publish api/EngineeringAtlas.Api.csproj --configuration Release --output dist/api"
+      }
+    },
+    "api-test": {
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "command": "dotnet test api.tests/EngineeringAtlas.Api.Tests.csproj --configuration Release"
       }
     }
   }
