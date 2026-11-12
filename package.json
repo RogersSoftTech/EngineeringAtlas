@@ -1,0 +1,46 @@
+{
+  "name": "engineering-atlas",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "nx serve --host 127.0.0.1",
+    "build": "nx build",
+    "test": "nx test --watch=false",
+    "build:pages": "nx build --base-href ./",
+    "prestart": "node scripts/configure-license.cjs",
+    "prebuild": "node scripts/configure-license.cjs",
+    "pretest": "node scripts/configure-license.cjs",
+    "prebuild:pages": "node scripts/configure-license.cjs"
+  },
+  "engines": {
+    "node": ">=22.22.3 <23 || >=24.15.0 <25 || >=26 <27"
+  },
+  "dependencies": {
+    "@angular/cdk": "^22.2.7",
+    "@angular/common": "^22.0.0",
+    "@angular/compiler": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "@angular/forms": "^22.0.0",
+    "@angular/platform-browser": "^22.0.0",
+    "@angular/router": "^22.0.0",
+    "@primeuix/themes": "^3.1.1",
+    "primeicons": "^8.0.2",
+    "primeng": "^22.1.5",
+    "rxjs": "~7.8.2",
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@angular-devkit/core": "^22.0.0",
+    "@angular-devkit/schematics": "^22.0.0",
+    "@angular/build": "^22.0.0",
+    "@angular/cli": "^22.0.0",
+    "@angular/compiler-cli": "^22.0.0",
+    "@nx/angular": "24.0.6",
+    "@nx/workspace": "24.0.6",
+    "@schematics/angular": "^22.0.0",
+    "jsdom": "^27.0.0",
+    "nx": "24.0.6",
+    "typescript": "~6.0.3",
+    "vitest": "^4.0.0"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "targetDefaults": {
+    "build": {
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production",
+        {
+          "runtime": "node scripts/license-fingerprint.cjs"
+        },
+        {
+          "env": "PRIMEUI_LICENSE_KEY"
+        }
+      ]
+    },
+    "test": {
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production"
+      ]
+    }
+  },
+  "defaultBase": "master",
+  "namedInputs": {
+    "sharedGlobals": [],
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
+    "production": [
+      "default"
+    ]
+  },
+  "nxCloudId": "6af5d5c1995b6de1c12a98f3",
+  "analytics": false
+}

@@ -1,0 +1,39 @@
+@if (module(); as m) {
+  <a class="back" [routerLink]="['/topic',m.topic.id]">← {{m.topic.name}}</a>
+  <div class="intro"><div class="tag">{{p.mode() === 'interview' ? 'INTERVIEW PRACTICE' : 'LEARNING MODULE'}}</div><h1>{{m.title}}</h1><p>{{m.topic.name}} · {{m.minutes}} minutes · {{p.mode() === 'interview' ? 'Practice is tracked separately from learning.' : 'Build understanding, then put it to work.'}}</p></div>
+  <div class="module-layout">
+    <nav class="module-nav" aria-label="Modules in this roadmap">
+      @for (item of m.topic.modules; track item.id; let i = $index) {
+        <a class="button" [class.active]="item.id === m.id" [attr.aria-current]="item.id === m.id ? 'page' : null" [routerLink]="['/module',item.id]">{{p.record(item.id).done ? '✓' : '0'+(i+1)}} &nbsp; {{item.title}}<small>{{p.record(item.id).done ? 'Complete' : p.record(item.id).started ? 'In progress' : 'Not started'}}</small></a>
+      }
+      <p class="muted">{{p.mode() === 'interview' ? 'Interview' : 'Learning'}} notes and completion are saved independently.</p>
+    </nav>
+    <article class="panel lesson">
+      @if (p.mode() === 'interview') {
+        <span class="tag">PRACTICE PROMPT</span><h2>{{m.question}}</h2><p>Spend 3–5 minutes answering aloud. Use a real example when possible. Explain constraints, alternatives, your contribution and measurable outcomes.</p>
+        <details><summary>Show answer guide & self-review criteria</summary><div class="evidence">{{m.rubric}}<p>Review: Was the answer specific? Were tradeoffs explicit? Did you explain validation and what you learned?</p></div></details>
+      } @else {
+        <h2>The core idea</h2><p>{{m.content}}</p><div class="evidence"><b>In your engineering context</b><br>{{m.example}}</div>
+        @if (m.topic.category === 'technical') {
+          <h3>Architecture in context</h3>
+          <div class="diagram" role="img" aria-label="Reference architecture: client to .NET API, SQL Server with transactional outbox, Kafka, C# worker and Redis projection">
+            <div class="node">Client / gateway</div><span>→</span><div class="node">.NET 10 API<br>OpenTelemetry</div><span>→</span><div class="node">SQL Server<br>Order + outbox</div><span>→</span><div class="node">Kafka</div><span>→</span><div class="node">C# worker<br>Redis projection</div>
+          </div>
+          <p class="muted">Reference system: the outbox relay publishes after commit. Consumers deduplicate events. GitHub Actions builds the container; Kubernetes runs API and workers. Trace IDs connect logs, metrics and spans. Adapt this design to the exercise rather than treating it as a universal solution.</p>
+        } @else {
+          <h3>A repeatable leadership practice</h3><div class="diagram" role="img" aria-label="Leadership practice cycle: listen, align, act, inspect"><div class="node">Listen<br>Gather evidence</div><span>→</span><div class="node">Align<br>Clarify outcomes</div><span>→</span><div class="node">Act<br>Small experiment</div><span>→</span><div class="node">Inspect<br>Feedback & adaptation</div></div>
+        }
+        <h3>Practical exercise</h3><p>{{m.exercise}}</p><p class="muted">Definition of done: produce the artifact, explain your tradeoffs, and record evidence or feedback that would change your approach.</p>
+        @if (m.topic.category === 'technical') {
+          <details><summary>Azure ↔ AWS reference map</summary><p>These are capability comparisons, not drop-in equivalents. Verify current service limits, pricing, supported versions and identity configuration before implementation.</p><div class="table-scroll"><table><thead><tr><th>Capability</th><th>Azure</th><th>AWS</th></tr></thead><tbody>@for (row of cloud; track row[0]) { <tr>@for (cell of row; track $index) { <td>{{cell}}</td> }</tr> }</tbody></table></div><p><a href="https://learn.microsoft.com/azure/" target="_blank" rel="noreferrer">Azure documentation ↗</a> · <a href="https://docs.aws.amazon.com/" target="_blank" rel="noreferrer">AWS documentation ↗</a> · <a href="https://learn.microsoft.com/dotnet/" target="_blank" rel="noreferrer">.NET documentation ↗</a></p></details>
+        }
+      }
+      <label for="work">{{p.mode() === 'interview' ? 'Your practice answer' : 'Exercise output / evidence'}}</label><textarea pTextarea id="work" [ngModel]="record().work ?? ''" (ngModelChange)="edit('work',$event)" placeholder="Capture your approach, results, or a link to your artifact…"></textarea>
+      <label for="notes">Personal notes</label><textarea pTextarea id="notes" [ngModel]="record().notes ?? ''" (ngModelChange)="edit('notes',$event)" placeholder="Questions, connections, decisions to revisit…"></textarea>
+      <label for="takeaway">Key takeaway</label><textarea pTextarea id="takeaway" [ngModel]="record().takeaway ?? ''" (ngModelChange)="edit('takeaway',$event)" placeholder="What will you apply in your work?"></textarea>
+      <label for="confidence">Confidence in applying this skill</label><p-select inputId="confidence" ariaLabel="Confidence in applying this skill" [options]="confidenceOptions" optionLabel="label" optionValue="value" [ngModel]="record().confidence ?? 0" (ngModelChange)="edit('confidence',$event)" appendTo="body" />
+      <div class="save-status" role="status">{{p.message() || 'Changes save automatically in this browser.'}}</div>
+      <div class="actions"><p-button [label]="record().done ? 'Completed · mark unfinished' : 'Mark module complete'" icon="pi pi-check" (onClick)="p.toggleComplete(m.id)" /><p-button label="Next module" icon="pi pi-arrow-right" iconPos="right" severity="secondary" (onClick)="next()" /></div>
+    </article>
+  </div>
+} @else { <div class="intro"><h1>Module not found</h1><a routerLink="/roadmaps">Choose a roadmap →</a></div> }
