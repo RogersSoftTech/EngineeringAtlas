@@ -15,7 +15,10 @@ import { CloudStatusComponent } from './cloud-status.component';
   providers: [MessageService, ConfirmationService],
   template: `
     <aside>
-      <a class="brand" routerLink="/dashboard"><span>◈</span> ATLAS<small>ENGINEERING GROWTH</small></a>
+      <div class="brand-section">
+        <img src="/rogers-soft-tech-logo.png" alt="Rogers Soft Tech" class="brand-logo" />
+        <a class="brand" routerLink="/dashboard"><span>◈</span> ATLAS<small>ENGINEERING GROWTH</small></a>
+      </div>
       <p class="eyebrow">YOUR WORKSPACE</p>
       <nav aria-label="Main navigation">
         <a routerLink="/dashboard" routerLinkActive="active">▦ &nbsp; Overview</a>
