@@ -8,7 +8,7 @@ permissions:
 jobs:
   verify:
     env:
-      PRIMEUI_LICENSE_KEY: ${{ secrets.PRIMEUI_LICENSE_KEY }}
+      PRIMENG_LICENSE: ${{ secrets.PRIMENG_LICENSE }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

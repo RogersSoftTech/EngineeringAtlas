@@ -26,7 +26,7 @@ Required repository secret:
 
 PrimeNG deployment setting:
 
-- `PRIMEUI_LICENSE_KEY`: the appropriate PrimeUI production license key. The local development key is not copied to GitHub. Without this secret, the generated client configuration has an empty license and PrimeNG may show a license notice. The browser must receive a PrimeUI license value as part of the compiled app, so it is not a place for private npm credentials.
+- `PRIMENG_LICENSE`: the existing organization secret, which must be shared with this repository (**Organization settings → Secrets → PRIMENG_LICENSE → repository access**). The local development key is not copied to GitHub. Without this secret, the generated client configuration has an empty license and PrimeNG may show a license notice. The browser must receive a PrimeUI license value as part of the compiled app, so it is not a place for private npm credentials.
 
 Use **Settings → Secrets and variables → Actions** in GitHub to update these settings. Reset the Azure deployment token if it is ever exposed, then replace the repository secret. GitHub's `GITHUB_TOKEN` uses read-only repository permissions for this workflow; the scoped Azure token authorizes the deployment.
 

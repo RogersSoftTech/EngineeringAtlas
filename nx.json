@@ -13,7 +13,7 @@
           "runtime": "node scripts/license-fingerprint.cjs"
         },
         {
-          "env": "PRIMEUI_LICENSE_KEY"
+          "env": "PRIMENG_LICENSE"
         }
       ]
     },

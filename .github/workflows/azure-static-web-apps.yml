@@ -39,7 +39,7 @@ jobs:
         run: npm run test:api
       - name: Build production site
         env:
-          PRIMEUI_LICENSE_KEY: ${{ secrets.PRIMEUI_LICENSE_KEY }}
+          PRIMENG_LICENSE: ${{ secrets.PRIMENG_LICENSE }}
         run: npm run build
       - name: Verify packaged site and access rules
         run: |
