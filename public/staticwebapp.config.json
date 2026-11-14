@@ -6,7 +6,7 @@
     { "route": "/logout", "redirect": "/.auth/logout", "statusCode": 302, "allowedRoles": ["anonymous"] },
     { "route": "/access-denied.html", "allowedRoles": ["anonymous"] },
     { "route": "/api/*", "allowedRoles": ["atlas_reader"] },
-    { "route": "/*", "allowedRoles": ["atlas_reader"] }
+    { "route": "/*", "allowedRoles": ["anonymous"] }
   ],
   "platform": { "apiRuntime": "dotnet-isolated:10.0" },
   "responseOverrides": {

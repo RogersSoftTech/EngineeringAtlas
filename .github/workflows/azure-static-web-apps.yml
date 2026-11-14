@@ -62,7 +62,7 @@ jobs:
           if-no-files-found: error
 
   deploy:
-    name: Deploy invite-only production site
+    name: Deploy public site with private cloud data
     needs: build
     if: vars.AZURE_STATIC_WEB_APPS_READY == 'true'
     runs-on: ubuntu-latest
@@ -97,7 +97,7 @@ jobs:
           skip_app_build: true
           skip_api_build: true
           production_branch: main
-      - name: Verify anonymous access is blocked
+      - name: Verify public content and private API
         env:
           SITE_URL: ${{ steps.deploy.outputs.static_web_app_url }}
         run: |
@@ -105,21 +105,25 @@ jobs:
           import fs from 'node:fs';
           const source = fs.readdirSync('dist/engineering-atlas/browser/courses').find(f => f.endsWith('.json'));
           if (!source || !process.env.SITE_URL) throw new Error('Missing deployment URL or course asset.');
-          for (const pathname of ['/', '/courses/' + source, '/api/learning/session']) {
-            let blocked = false;
+          const checks = [
+            { pathname: '/', isValid: response => response.status === 200, expected: 'public site response' },
+            { pathname: '/courses/' + source, isValid: response => response.status === 200, expected: 'public course response' },
+            { pathname: '/api/learning/session', isValid: response => response.status === 302 && (response.headers.get('location') || '').includes('/.auth/login/github'), expected: 'GitHub sign-in redirect for private API' }
+          ];
+          for (const { pathname, isValid, expected } of checks) {
+            let verified = false;
             for (let attempt = 0; attempt < 6; attempt++) {
               const response = await fetch(new URL(pathname, process.env.SITE_URL), { redirect: 'manual' });
-              const location = response.headers.get('location') || '';
-              if (response.status === 302 && location.includes('/.auth/login/github')) { blocked = true; break; }
+              if (isValid(response)) { verified = true; break; }
               if (attempt < 5) await new Promise(resolve => setTimeout(resolve, 5000));
             }
-            if (!blocked) throw new Error('Expected GitHub sign-in redirect for ' + pathname);
+            if (!verified) throw new Error('Expected ' + expected + ' at ' + pathname);
           }
-          console.log('Anonymous requests to the app, course JSON and storage API require GitHub sign-in.');
+          console.log('Anonymous visitors can load the site and course content; the storage API still requires GitHub sign-in.');
           NODE
       - name: Record deployment
         env:
           SITE_URL: ${{ steps.deploy.outputs.static_web_app_url }}
         shell: bash
         run: |
-          printf '### EngineeringAtlas\n\nAzure deployment: %s\n\nAccess requires GitHub sign-in and the atlas_reader role.\n' "$SITE_URL" >> "$GITHUB_STEP_SUMMARY"
+          printf '### EngineeringAtlas\n\nAzure deployment: %s\n\nThe site and learning content are public. Private Azure progress and course imports require GitHub sign-in and the atlas_reader role.\n' "$SITE_URL" >> "$GITHUB_STEP_SUMMARY"

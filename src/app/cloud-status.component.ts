@@ -6,6 +6,7 @@ import { RouterLink } from '@angular/router';
   <section class="cloud-status" aria-label="Cloud saving status">
     <a class="cloud-lab-link" routerLink="/storage-lab">Learn how cloud saving works ↗</a>
     <div class="cloud-status-line"><span><b>{{sync.status()}}</b>@if(sync.api.identity();as identity){<span class="muted"> · {{identity.displayName}}</span>}</span><div class="actions">@if(sync.ready()&&sync.api.active()){<p-button label="Sync now" icon="pi pi-cloud" size="small" severity="secondary" [disabled]="sync.busy()||sync.conflict()" (onClick)="sync.syncNow()"/>}@else{<p-button label="Retry connection" size="small" (onClick)="sync.start()"/>}</div></div>
+    @if(sync.ready()&&!sync.api.active()){<p>Browsing is public. Sign in with an invited GitHub account to save notes, progress, and course imports to Azure. Changes made while signed out stay in this browser. <a href="/login">Sign in</a></p>}
     @if(sync.problem()){<p role="alert">{{sync.problem()}} @if(!sync.ready()){<a href="/login">Sign in again</a>}</p>}
     @if(sync.courses.pendingCount()){<p role="status">{{sync.courses.pendingCount()}} imported course texts still need to upload. {{sync.courses.syncMessage()}}</p>}
     @if(sync.conflict()){<div class="actions"><p-button label="Use Azure version" severity="secondary" (onClick)="sync.resolveConflict(false)"/><p-button label="Keep this device’s version" (onClick)="sync.resolveConflict(true)"/></div>}

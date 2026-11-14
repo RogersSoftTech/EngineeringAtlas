@@ -14,9 +14,15 @@ describe('account-scoped Azure synchronization',()=>{
     courses={activateCloudScope:vi.fn(),refreshImports:vi.fn(),syncPending:vi.fn(),legacyImports:vi.fn().mockResolvedValue([]),saveDocuments:vi.fn()};
     TestBed.configureTestingModule({providers:[{provide:CloudApiService,useValue:api},{provide:CourseLibraryService,useValue:courses}]});
   });
-  afterEach(()=>{TestBed.resetTestingModule();vi.restoreAllMocks();});
+  afterEach(()=>{TestBed.resetTestingModule();vi.restoreAllMocks();vi.unstubAllGlobals();});
   it('loads the signed-in account state without uploading legacy browser data automatically',async()=>{
     const p=TestBed.inject(ProgressService);p.update('t0m0',{notes:'Legacy'});const s=TestBed.inject(CloudSyncService);await s.start();expect(p.record('t0m0').notes).toBeUndefined();expect(s.legacyAvailable()).toBe(true);expect(api.saveProgress).not.toHaveBeenCalled();expect(p.legacyState()?.records['learning:t0m0'].notes).toBe('Legacy');
+  });
+  it('keeps public browsing available when cloud authentication is unavailable',async()=>{
+    vi.stubGlobal('location',{hostname:'engineering-atlas.azurestaticapps.net'});
+    api.connect.mockRejectedValue(new CloudError('UNREACHABLE','Sign-in is required.'));
+    const s=TestBed.inject(CloudSyncService);await s.start();
+    expect(s.ready()).toBe(true);expect(api.active()).toBe(false);expect(s.status()).toContain('Public browsing');
   });
   it('saves edits with the last known Azure version and retains an account-scoped device copy',async()=>{
     const s=TestBed.inject(CloudSyncService);await s.start();s.p.update('t0m0',{notes:'My cloud note'});await s.syncNow();expect(api.saveProgress).toHaveBeenCalledWith(expect.objectContaining({records:expect.objectContaining({'learning:t0m0':expect.objectContaining({notes:'My cloud note'})})}),'v1');expect(s.status()).toBe('Saved to Azure ✓');expect(localStorage.getItem('engineering-atlas-v1:alice')).toContain('My cloud note');

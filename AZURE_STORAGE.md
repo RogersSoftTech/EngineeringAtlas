@@ -13,7 +13,7 @@ flowchart LR
   API --> Blob[Private learning-data container]
 ```
 
-Static Web Apps checks GitHub sign-in and the `atlas_reader` role. The API checks the forwarded principal again, derives an opaque prefix from the provider and app-specific user ID, validates the document, and uses an atomic ETag condition for a save. No user ID from a JSON body controls the blob path. A client account fingerprint is checked on writes to prevent an old browser queue from being submitted under a different newly signed-in account.
+The Angular app and its bundled learning content are public. Static Web Apps restricts `/api/*` to GitHub sign-ins with the `atlas_reader` role. The API checks the forwarded principal and role again, derives an opaque prefix from the provider and app-specific user ID, validates the document, and uses an atomic ETag condition for a save. No user ID from a JSON body controls the blob path. A client account fingerprint is checked on writes to prevent an old browser queue from being submitted under a different newly signed-in account.
 
 The API must remain a **managed Static Web Apps API**. The forwarded-principal pattern is not authentication for an independently exposed public Functions endpoint.
 
@@ -50,7 +50,7 @@ The app sends cookies only to its own origin. Storage credentials never leave th
 
 ## Sync and migration
 
-- On startup, the app establishes the signed-in scope before showing personal content. It loads Azure progress and lists available imported courses.
+- On startup, an authorized sign-in establishes the account scope before personal cloud data is shown. It loads Azure progress and lists that account's imported courses. Without an authorized account, public materials remain available and edits/imports stay in that browser.
 - Edits are written to an account-scoped device cache, then uploaded after a short debounce. **Saved to Azure** confirms the server accepted the save. Opening another device, returning focus, reconnecting, or selecting **Sync now** refreshes data.
 - Queued device edits are retained across reloads. If Azure has a different version, the UI keeps the device copy and asks which version to retain. It does not silently merge competing note text. Export a progress backup before intentionally replacing a version.
 - Imported courses are separate documents. An unsuccessful upload stays queued. A stale course upload is kept locally; reimporting the source while online deliberately replaces the current Azure text using its latest version condition.
