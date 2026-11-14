@@ -25,6 +25,7 @@ import { CloudStatusComponent } from './cloud-status.component';
         <a routerLink="/roadmaps" routerLinkActive="active">▤ &nbsp; Learning roadmaps</a>
         <a routerLink="/courses" routerLinkActive="active">▥ &nbsp; Course library</a>
         <a routerLink="/takeaways" routerLinkActive="active">✧ &nbsp; My takeaways</a>
+        <a href="https://rogers-soft-tech.com/home">← &nbsp; Rogers Soft Tech home</a>
       </nav>
       <div class="side-bottom"><b>Built for your next chapter.</b><p>Technical depth.<br>Leadership that scales.</p>
         <p-button label="Export my progress" icon="pi pi-download" size="small" (onClick)="exportBackup()" />
