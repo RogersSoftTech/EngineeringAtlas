@@ -1,15 +1,28 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { routes } from './app.routes';
 import { ModuleComponent } from './module.component';
 import { RoadmapsComponent } from './roadmaps.component';
 import { ProgressService } from './progress.service';
 import { provideAtlasPrimeNG } from './prime-theme';
+import { AppComponent } from './app.component';
+import { CloudSyncService } from './cloud-sync.service';
+import { signal } from '@angular/core';
 
 describe('Angular navigation and forms', () => {
   beforeEach(() => {localStorage.clear(); TestBed.configureTestingModule({providers:[provideRouter(routes), provideAtlasPrimeNG()]});});
+  it('provides a link back to the Rogers Soft Tech home page', () => {
+    TestBed.overrideProvider(CloudSyncService, { useValue: {
+      start: vi.fn(), ready: signal(true), status: signal(''), problem: signal(''),
+      api: { active: signal(false), identity: signal(null) },
+      courses: { pendingCount: signal(0) }, conflict: signal(false), legacyAvailable: signal(false)
+    } });
+    const fixture=TestBed.createComponent(AppComponent); fixture.detectChanges();
+    const link=fixture.nativeElement.querySelector('nav a[href="https://rogers-soft-tech.com/home"]') as HTMLAnchorElement | null;
+    expect(link?.textContent).toContain('Rogers Soft Tech home');
+  });
   it('filters roadmap cards through the rendered search field', async () => {
     const h=await RouterTestingHarness.create(); await h.navigateByUrl('/roadmaps',RoadmapsComponent);
     expect(h.routeNativeElement!.querySelectorAll('atlas-topic-card')).toHaveLength(13);
