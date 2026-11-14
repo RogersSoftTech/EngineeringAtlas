@@ -1,6 +1,6 @@
 # Your Azure storage learning exercise
 
-The app you are using is the example. It saves notes, progress and imported course replies in a private Azure Blob container, while keeping a device copy for interruptions.
+The learning materials are public. With an invited GitHub account, the app saves notes, progress and imported course replies in a private Azure Blob container, while keeping a device copy for interruptions. Signed-out changes remain in the current browser.
 
 ## 1. Trace a save
 
@@ -12,7 +12,7 @@ The request contains your progress JSON and a version condition. It does not con
 
 ## 2. Understand the trust boundary
 
-Azure Static Web Apps checks your sign-in and the invited `atlas_reader` role. It forwards a verified client principal to the managed .NET API. The API checks the role again and derives a storage prefix from the provider and user ID. A user ID supplied in the request body never chooses the storage location.
+Azure Static Web Apps allows anonymous access to the site but checks sign-in and the invited `atlas_reader` role for `/api/*`. It forwards a verified client principal to the managed .NET API. The API checks the role again and derives a storage prefix from the provider and user ID. A user ID supplied in the request body never chooses the storage location.
 
 The API is a managed function behind Static Web Apps. Do not copy this header-trust pattern to an independently exposed public server without adding real token verification.
 
@@ -20,7 +20,7 @@ The API is a managed function behind Static Web Apps. Do not copy this header-tr
 
 ## 3. Inspect the document model
 
-The storage account is `statlaslearne76c5290`. Its private container is `learning-data`.
+The learning-data container is private and is reachable only by the managed API.
 
 ```text
 learning-data/

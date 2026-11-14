@@ -10,9 +10,9 @@ EngineeringAtlas deploys from `main` in **RogersSoftTech/EngineeringAtlas** to *
 - Static Web App: `engineering-atlas`
 - Region: East US 2
 - Site: https://thankful-desert-07248a70f.8.azurestaticapps.net
-- Deployment job: `Deploy invite-only production site`
+- Deployment job: `Deploy public site with private cloud data`
 
-The app is reachable on the internet, but its HTML, JavaScript, styles and all bundled course JSON require the custom `atlas_reader` role. GitHub sign-in alone does not grant access. Users must accept an invitation to that role. This is application-level access control, not a private network endpoint.
+The Angular application, roadmaps and 50 bundled course excerpts are publicly viewable without signing in. The Static Web Apps route rule keeps `/api/*` restricted to `atlas_reader`; the API independently checks the authenticated principal and role before returning or changing account-scoped progress and imported courses. Public access does not make Azure storage or user-specific data public.
 
 ## What the action does
 
@@ -30,9 +30,9 @@ PrimeNG deployment setting:
 
 Use **Settings → Secrets and variables → Actions** in GitHub to update these settings. Reset the Azure deployment token if it is ever exposed, then replace the repository secret. GitHub's `GITHUB_TOKEN` uses read-only repository permissions for this workflow; the scoped Azure token authorizes the deployment.
 
-## Invite an account
+## Authorize cloud saving
 
-In Azure Portal, open **engineering-atlas → Role management → Invite**. Select **GitHub**, enter the person's exact GitHub username, choose the site's domain, and assign `atlas_reader`. Share the generated invitation directly with that person. Accept the invitation while signed into the matching GitHub account.
+Public browsing needs no invitation. To enable private Azure progress and imported-course sync, open **engineering-atlas → Role management → Invite** in Azure Portal. Select **GitHub**, enter the person's exact GitHub username, choose the site's domain, and assign `atlas_reader`. Share the generated invitation directly with that person. Accept the invitation while signed into the matching GitHub account.
 
 For the owner account, the equivalent CLI command is:
 
@@ -40,9 +40,9 @@ For the owner account, the equivalent CLI command is:
 az staticwebapp users invite --name engineering-atlas --resource-group rg-engineering-atlas --authentication-provider GitHub --user-details jwr3408 --roles atlas_reader --domain thankful-desert-07248a70f.8.azurestaticapps.net --invitation-expiration-in-hours 168
 ```
 
-Invitation links expire after the selected interval; an accepted role remains until removed in Role management. An uninvited signed-in account sees the access-restricted page. `/logout` signs out; `/login` starts GitHub sign-in.
+Invitation links expire after the selected interval; an accepted role remains until removed in Role management. An uninvited account can still browse all public materials, but cannot access private cloud data. `/logout` signs out; `/login` starts GitHub sign-in.
 
-`public/staticwebapp.config.json` is enforced by Azure at the HTTP layer and is copied to the built site's root. All application and course assets are protected. Angular uses hash routes, so no navigation fallback is needed. Local `npm start` does not enforce Azure authentication; use the deployed host to verify access control.
+`public/staticwebapp.config.json` is enforced by Azure at the HTTP layer and is copied to the built site's root. The catch-all route allows anonymous access; the more-specific `/api/*` route still requires `atlas_reader`. Angular uses hash routes, so no navigation fallback is needed. Local `npm start` does not enforce Azure authentication; use the deployed host to verify the public pages and protected API.
 
 ## Run or roll back a deployment
 
@@ -58,6 +58,6 @@ npm run build
 node scripts/verify-azure-deployment.cjs dist/engineering-atlas/browser
 ```
 
-The verifier checks the production index, all 50 course assets and access requirements for every packaged asset. Deployment should also be checked anonymously: `/` and a direct `/courses/<id>.json` request must redirect to GitHub sign-in, while an authenticated account without `atlas_reader` must be denied. The access-restricted HTML page contains no course content.
+The verifier checks the production index, all 50 course assets, anonymous access rules for packaged files, and the protected API route. After deployment, anonymous requests to `/` and `/courses/<id>.json` must return successfully, while `/api/learning/session` must redirect to GitHub sign-in. An authenticated account without `atlas_reader` remains denied access to the API. Public static course excerpts and their source links are part of the published site; account-specific notes, progress and imported replacements remain behind the API.
 
 Microsoft references: [build configuration](https://learn.microsoft.com/azure/static-web-apps/build-configuration), [authorization](https://learn.microsoft.com/azure/static-web-apps/authentication-authorization), [routing configuration](https://learn.microsoft.com/azure/static-web-apps/configuration).

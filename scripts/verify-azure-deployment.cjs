@@ -4,7 +4,11 @@ const assert = require('node:assert/strict');
 const root = path.resolve(process.argv[2] || 'dist/engineering-atlas/browser');
 const config = JSON.parse(fs.readFileSync(path.join(root, 'staticwebapp.config.json'), 'utf8'));
 assert.equal(config.platform?.apiRuntime,'dotnet-isolated:10.0');
-assert.deepEqual(config.routes.find(r=>r.route==='/api/*')?.allowedRoles,['atlas_reader']);
+const apiRoute=config.routes.findIndex(r=>r.route==='/api/*');
+const publicRoute=config.routes.findIndex(r=>r.route==='/*');
+assert.ok(apiRoute>=0 && publicRoute>apiRoute,'The private API rule must precede the public site rule');
+assert.deepEqual(config.routes[apiRoute]?.allowedRoles,['atlas_reader']);
+assert.deepEqual(config.routes[publicRoute]?.allowedRoles,['anonymous']);
 assert.ok(fs.existsSync(path.join(root, 'index.html')), 'Build output is missing index.html');
 assert.ok(fs.existsSync(path.join(root, 'access-denied.html')), 'Missing access-denied page');
 assert.ok(!config.navigationFallback, 'Hash routes do not require navigationFallback; keep authorization on every asset request');
@@ -21,14 +25,15 @@ function walk(directory) {
   }
 }
 walk(root);
-for(const file of files.filter(f=>f!=='/access-denied.html' && f!=='/staticwebapp.config.json')) {
+for(const file of files) {
   const rule=config.routes.find(r=>matches(r,file));
-  assert.deepEqual(rule?.allowedRoles,['atlas_reader'], 'App assets and course content must be invite-only: '+file);
+  assert.deepEqual(rule?.allowedRoles,['anonymous'], 'Public site assets must allow anonymous access: '+file);
 }
-assert.deepEqual(config.routes.find(r=>matches(r,'/'))?.allowedRoles,['atlas_reader']);
+assert.deepEqual(config.routes.find(r=>matches(r,'/'))?.allowedRoles,['anonymous']);
+assert.deepEqual(config.routes.find(r=>matches(r,'/api/learning/session'))?.allowedRoles,['atlas_reader']);
 const courses=files.filter(f=>/^\/courses\/.+\.json$/.test(f));
 assert.equal(courses.length,50,'Expected all 50 course assets in the deployment package');
-console.log('Verified production index, 50 course assets, and invite-only authorization for '+files.length+' files.');
+console.log('Verified production index, 50 public course assets, and protected API routing for '+files.length+' files.');
 if(process.argv[3]){
   const api=path.resolve(process.argv[3]);
   for(const file of ['host.json','worker.config.json','EngineeringAtlas.Api.dll','.azurefunctions/Microsoft.Azure.WebJobs.Extensions.FunctionMetadataLoader.dll'])assert.ok(fs.existsSync(path.join(api,file)),'Missing managed API deployment file: '+file);

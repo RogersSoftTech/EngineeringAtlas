@@ -36,7 +36,7 @@ import { CloudStatusComponent } from './cloud-status.component';
       <header><span>Personal development / <b>Your workspace</b></span><p-selectbutton [options]="modes" optionLabel="label" optionValue="value" [allowEmpty]="false" [ngModel]="p.mode()" (ngModelChange)="p.setMode($event)" ariaLabel="Study mode" /></header>
       @if (!p.storageOK()) { <div class="notice" role="alert">The device backup is unavailable. Check the cloud status below and export a progress backup if needed.</div> }
       <atlas-cloud-status />
-      @if(cloud.ready()){<router-outlet />}@else{<div class="panel empty">Connecting your signed-in learning workspace. Your existing browser data is kept.</div>}
+      @if(cloud.ready()){<router-outlet />}@else{<div class="panel empty">Loading Engineering Atlas. Your existing browser data is kept.</div>}
       <footer>ENGINEERING ATLAS <span>Small steps. Compounding growth.</span></footer>
     </main>
     <p-toast /><p-confirmdialog />

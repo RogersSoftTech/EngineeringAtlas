@@ -24,7 +24,7 @@ export class CloudSyncService {
       else{this.meta.etag=remote.etag;if(remote.state)this.apply(remote.state);this.writeMeta();}
       this.legacyAvailable.set(!this.meta.legacyUploaded&&((await this.courses.legacyImports()).length>0||Object.keys(this.legacy?.records??{}).length>0||Object.keys(this.legacy?.courseRecords??{}).length>0));
       this.ready.set(true);if(!this.conflict()){this.status.set(this.meta.pending?'Saved on device · upload pending':'Connected to Azure');await this.syncNow();}
-    }catch(error){this.applying=false;if(typeof location!=='undefined'&&['localhost','127.0.0.1'].includes(location.hostname)){this.api.active.set(false);this.ready.set(true);this.status.set('Local development · browser storage');}else{this.status.set('Azure connection unavailable');this.problem.set(this.describe(error));}}
+    }catch(error){this.applying=false;if(typeof location!=='undefined'&&['localhost','127.0.0.1'].includes(location.hostname)){this.api.active.set(false);this.ready.set(true);this.status.set('Local development · browser storage');}else{this.ready.set(true);this.status.set('Public browsing · Azure connection unavailable');this.problem.set(this.describe(error));}}
   }
   private readMeta():SyncMetadata{try{return JSON.parse(localStorage.getItem(this.metadataKey)??'null')??{etag:null,pending:false};}catch{return{etag:null,pending:false};}}
   private writeMeta(){try{localStorage.setItem(this.metadataKey,JSON.stringify(this.meta));}catch{this.problem.set('Device backup storage is full. Export your progress before closing.');}}

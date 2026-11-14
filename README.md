@@ -1,6 +1,6 @@
 # Engineering Atlas — Angular
 
-Signed-in notes, progress and imported courses now save to private Azure Blob Storage through a .NET 10 API. Open **Learn how cloud saving works** in the app, or read [AZURE_STORAGE.md](AZURE_STORAGE.md), for the architecture, migration and exercises. Localhost remains browser-only unless the API is emulated.
+The site and its learning materials are publicly viewable without signing in. Notes, progress and imported courses can be saved to private Azure Blob Storage through a .NET 10 API after signing in with an invited account. Open **Learn how cloud saving works** in the app, or read [AZURE_STORAGE.md](AZURE_STORAGE.md), for the architecture, migration and exercises. Localhost remains browser-only unless the API is emulated.
 
 PrimeNG controls and the blue Aura theme are configured. See [PRIMENG.md](PRIMENG.md) for component details and local/CI license setup.
 
@@ -46,7 +46,7 @@ The included `.gitignore` excludes dependencies, build output, caches and enviro
 
 ## Deploy to Azure
 
-The production workflow builds, tests, and deploys to an invite-only Azure Static Web App. Pushes to `main` deploy automatically after the Azure settings are configured. See [DEPLOYMENT.md](DEPLOYMENT.md) for the live target, GitHub secrets, role invitations, and deployment controls.
+The production workflow builds, tests, and deploys the public site and its private-data API to Azure Static Web Apps. Pushes to `main` deploy automatically after the Azure settings are configured. See [DEPLOYMENT.md](DEPLOYMENT.md) for the live target, GitHub secrets, cloud-saving role invitations, and deployment controls.
 
 ## Use the workspace
 
@@ -61,7 +61,7 @@ The production workflow builds, tests, and deploys to an invite-only Azure Stati
 
 Export a backup from the original site, then import it into this Angular app. The module IDs and `engineering-atlas-v1` format are preserved. For existing browser data, choose **Upload browser data to my account** once from that browser and site address. Wait for **Saved to Azure** before switching devices. Localhost remains browser-only. Keep JSON exports as an additional backup.
 
-The deployed app uses GitHub sign-in and a private .NET API for cross-device synchronization. The curriculum is a starting point; cloud mappings represent capabilities rather than exact equivalents. Confirm current implementation details in official vendor documentation.
+Public visitors can explore the roadmaps and bundled course excerpts without signing in. GitHub sign-in with the `atlas_reader` role is still required for private Azure sync; signed-out changes stay in that browser. The curriculum is a starting point; cloud mappings represent capabilities rather than exact equivalents. Confirm current implementation details in official vendor documentation.
 
 ## Project structure
 
